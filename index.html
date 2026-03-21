@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EKIN AI STUDIO - Pro Version</title>
+    <style>
+        :root {
+            --primary: #00ffcc;
+            --secondary: #ff00ff;
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --text-color: #f8fafc;
+            --border-radius: 12px;
+            --success-glow: #00ffcc55;
+            --error-glow: #ff444455;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            background: var(--panel-bg);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Tampilan Banner Informasi API Baru */
+        .api-banner {
+            background-color: rgba(255, 165, 0, 0.1);
+            border: 1px solid orange;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #ffd700;
+            line-height: 1.5;
+        }
+
+        .api-banner a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 1px dashed var(--primary);
+            padding-bottom: 2px;
+            transition: all 0.3s;
+        }
+
+        .api-banner a:hover {
+            color: #fff;
+            border-bottom: 1px solid #fff;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .controls-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: #0f172a;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button:hover {
+            background-color: #00e6b8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 204, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-download {
+            background-color: var(--secondary);
+            color: white;
+            display: none; /* Disembunyikan sampai gambar selesai dimuat */
+        }
+
+        .btn-download:hover {
+            background-color: #cc00cc;
+            box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4);
+        }
+
+        .result-container {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 900px;
+            min-height: 400px;
+            background: var(--panel-bg);
+            border-radius: var(--border-radius);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 2px solid transparent;
+            transition: border-color 0.5s, box-shadow 0.5s;
+            padding-bottom: 20px;
+        }
+
+        .result-container.success {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px var(--success-glow);
+        }
+        
+        .result-container.error {
+            border-color: #ff4444;
+            box-shadow: 0 10px 30px var(--error-glow);
+        }
+
+        #result-img {
+            max-width: 90%;
+            max-height: 75vh;
+            display: none;
+            object-fit: contain;
+            border-radius: calc(var(--border-radius) / 2);
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .loader {
+            display: none;
+            border: 4px solid #334155;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        .status-text {
+            display: none;
+            margin: 20px;
+            color: #94a3b8;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .container { padding: 15px; }
+            .result-container { min-height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>EKIN AI STUDIO</h1>
+        <p class="subtitle">Professional AI Image Generator</p>
+    </header>
+
+    <div class="container">
+        
+        <div class="api-banner">
+            ⚠️ <strong>Info Penting:</strong> Sistem AI kini mewajibkan penggunaan API Key. Silakan dapatkan API Key Anda secara <strong>GRATIS</strong> dengan mendaftar di <a href="https://enter.pollinations.ai" target="_blank">enter.pollinations.ai</a>. Setelah login, salin kunci tersebut dan masukkan ke kolom di bawah ini.
+        </div>
+
+        <div class="input-group">
+            <label for="apikey">🔑 Pollinations API Key (Otomatis Tersimpan)</label>
+            <input type="password" id="apikey" placeholder="Masukkan API Key Anda di sini (contoh: pk_abc123...)" required>
+        </div>
+
+        <div class="input-group">
+            <label for="prompt">📝 Deskripsi Gambar (Prompt)</label>
+            <textarea id="prompt" rows="3" placeholder="Contoh: a cyberpunk city at night, neon lights, 8k resolution..."></textarea>
+        </div>
+
+        <div class="controls-row">
+            <div class="input-group">
+                <label for="model">🤖 Model AI</label>
+                <select id="model">
+                    <option value="flux">Flux (Cepat & Bagus)</option>
+                    <option value="flux-realism">Flux Realism (Fotorealistis)</option>
+                    <option value="flux-pro">Flux Pro (Detail Tinggi)</option>
+                    <option value="turbo">Turbo (Super Cepat)</option>
+                    <option value="any-dark">Any Dark (Sinematik/Gelap)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="style">🎨 Style Unik</label>
+                <select id="style">
+                    <option value="">Tidak ada (Sesuai Prompt)</option>
+                    <option value="Cinematic lighting, 8k resolution, highly detailed, professional photo style">Cinematic lighting, 8k</option>
+                    <option value="Quantum Fold Distortion, surreal collapsing realities, fractal patterns, intricate details">Quantum Fold</option>
+                    <option value="Lowbrow Pop Surrealism, absurd and humorous character design, highly detailed">Pop Surrealism</option>
+                    <option value="Tribal Explosion Graffiti, vibrant colors, kinetic energy, complex street art style">Tribal Graffiti</option>
+                    <option value="Ukiyo-e Japanese Woodblock Print, traditional ink style, flowing lines">Ukiyo-e Woodblock</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="ratio">📐 Aspek Rasio</label>
+                <select id="ratio">
+                    <option value="9:16">9:16 (Potret/Reels - 1080x1920)</option>
+                    <option value="1:1">1:1 (Kotak - 1024x1024)</option>
+                    <option value="16:9">16:9 (Lanskap - 1920x1080)</option>
+                    <option value="3:4">3:4 (Potret Klasik - 768x1024)</option>
+                    <option value="4:3">4:3 (Layar Standar - 1024x768)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="seed">🎲 Seed (Opsional)</label>
+                <input type="number" id="seed" placeholder="Kosongkan untuk acak">
+            </div>
+        </div>
+
+        <button onclick="generateImage()">🔥 Generate Gambar</button>
+    </div>
+
+    <div class="result-container" id="result-container">
+        <div class="loader" id="loader"></div>
+        <img id="result-img" alt="Hasil EKIN AI STUDIO" crossorigin="anonymous">
+        <p class="status-text" id="status-text"></p>
+        
+        <button id="btn-download" class="btn-download" onclick="downloadImage()">💾 Download Resolusi Tinggi (PNG)</button>
+    </div>
+
+    <script>
+        let currentObjectURL = null;
+
+        // FITUR AUTO-SAVE: Memuat API Key yang tersimpan saat web dibuka
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('ekin_api_key');
+            if (savedKey) {
+                document.getElementById('apikey').value = savedKey;
+            }
+        });
+
+        async function generateImage() {
+            const apiKey = document.getElementById('apikey').value.trim();
+            const promptInput = document.getElementById('prompt').value.trim();
+            
+            if (!apiKey) {
+                alert('Tolong masukkan API Key Anda! Jika belum punya, dapatkan di enter.pollinations.ai');
+                return;
+            }
+
+            if (!promptInput) {
+                alert('Silakan masukkan deskripsi gambar (prompt)!');
+                return;
+            }
+
+            // FITUR AUTO-SAVE: Menyimpan API Key ke browser
+            localStorage.setItem('ekin_api_key', apiKey);
+
+            const model = document.getElementById('model').value;
+            const style = document.getElementById('style').value;
+            const ratio = document.getElementById('ratio').value;
+            let seed = document.getElementById('seed').value;
+
+            if (!seed) {
+                seed = Math.floor(Math.random() * 999999999);
+            }
+
+            let width = 1024, height = 1024;
+            if (ratio === '16:9') { width = 1920; height = 1080; }
+            else if (ratio === '9:16') { width = 1080; height = 1920; }
+            else if (ratio === '3:4') { width = 768; height = 1024; }
+            else if (ratio === '4:3') { width = 1024; height = 768; }
+
+            const finalPrompt = style ? `${promptInput}, ${style}` : promptInput;
+            const encodedPrompt = encodeURIComponent(finalPrompt);
+
+            const url = `https://gen.pollinations.ai/image/${encodedPrompt}?model=${model}&width=${width}&height=${height}&seed=${seed}&nologo=true&key=${apiKey}`;
+
+            const containerEl = document.getElementById('result-container');
+            const imgEl = document.getElementById('result-img');
+            const loader = document.getElementById('loader');
+            const statusText = document.getElementById('status-text');
+            const btnDownload = document.getElementById('btn-download');
+
+            // Reset UI
+            imgEl.style.display = 'none';
+            btnDownload.style.display = 'none'; // Sembunyikan tombol download
+            containerEl.classList.remove('success', 'error');
+            loader.style.display = 'block';
+            statusText.innerText = "Memproses request ke server AI... Mohon tunggu.";
+            statusText.style.color = "#94a3b8";
+            statusText.style.display = 'block';
+
+            if (currentObjectURL) {
+                URL.revokeObjectURL(currentObjectURL);
+                currentObjectURL = null;
+            }
+
+            try {
+                const response = await fetch(url);
+                
+                if (response.status === 401 || response.status === 403) {
+                    throw new Error("Akses Ditolak (401/403). API Key Anda salah atau kuota model ini habis.");
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Kesalahan API: ${response.status} ${response.statusText}`);
+                }
+
+                const imageBlob = await response.blob();
+                
+                if (imageBlob.type.includes('application/json') || imageBlob.type.includes('text/html')) {
+                    throw new Error("Server tidak mengembalikan file gambar. Kemungkinan API Key salah.");
+                }
+
+                currentObjectURL = URL.createObjectURL(imageBlob);
+
+                imgEl.onload = () => {
+                    loader.style.display = 'none';
+                    statusText.style.display = 'none';
+                    imgEl.style.display = 'block';
+                    btnDownload.style.display = 'flex'; // Munculkan tombol download
+                    containerEl.classList.add('success');
+                };
+                
+                imgEl.onerror = () => {
+                     throw new Error("Gagal merender gambar ke layar.");
+                };
+
+                imgEl.src = currentObjectURL;
+
+            } catch (error) {
+                loader.style.display = 'none';
+                containerEl.classList.add('error');
+                statusText.innerText = `Gagal: ${error.message}`;
+                statusText.style.color = "#ff4444";
+                console.error("Image generation error:", error);
+            }
+        }
+
+        // FUNGSI BARU: Konversi ke PNG dan Download
+        function downloadImage() {
+            const imgEl = document.getElementById('result-img');
+            
+            // Membuat elemen canvas transparan untuk merender ulang gambar sebagai murni PNG
+            const canvas = document.createElement('canvas');
+            canvas.width = imgEl.naturalWidth;
+            canvas.height = imgEl.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            
+            // Gambar img ke dalam canvas
+            ctx.drawImage(imgEl, 0, 0);
+            
+            // Ekstrak data dari canvas secara spesifik sebagai image/png
+            const dataURL = canvas.toDataURL('image/png');
+            
+            // Buat link download otomatis
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = `EKIN-AI-${Date.now()}.png`; // Nama file unik
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
