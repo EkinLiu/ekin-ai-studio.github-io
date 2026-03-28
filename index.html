@@ -3,441 +3,446 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EKIN AI STUDIO - Pro Version</title>
+    <title>EKIN AI STUDIO - Image Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --primary: #00ffcc;
-            --secondary: #ff00ff;
-            --bg-color: #0f172a;
-            --panel-bg: #1e293b;
-            --text-color: #f8fafc;
-            --border-radius: 12px;
-            --success-glow: #00ffcc55;
-            --error-glow: #ff444455;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
         }
-
-        header {
-            margin-bottom: 20px;
-            text-align: center;
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        h1 {
-            font-size: 2.5rem;
-            color: var(--primary);
-            text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-        }
-
-        p.subtitle {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-            max-width: 900px;
-            background: var(--panel-bg);
-            padding: 25px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        /* Tampilan Banner Informasi API Baru */
-        .api-banner {
-            background-color: rgba(255, 165, 0, 0.1);
-            border: 1px solid orange;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            color: #ffd700;
-            line-height: 1.5;
-        }
-
-        .api-banner a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: bold;
-            border-bottom: 1px dashed var(--primary);
-            padding-bottom: 2px;
-            transition: all 0.3s;
-        }
-
-        .api-banner a:hover {
-            color: #fff;
-            border-bottom: 1px solid #fff;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #cbd5e1;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: white;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary);
-        }
-
-        .controls-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        button {
-            background-color: var(--primary);
-            color: #0f172a;
-            border: none;
-            padding: 15px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        button:hover {
-            background-color: #00e6b8;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 255, 204, 0.4);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .btn-download {
-            background-color: var(--secondary);
-            color: white;
-            display: none; /* Disembunyikan sampai gambar selesai dimuat */
-        }
-
-        .btn-download:hover {
-            background-color: #cc00cc;
-            box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4);
-        }
-
-        .result-container {
-            margin-top: 30px;
-            width: 100%;
-            max-width: 900px;
-            min-height: 400px;
-            background: var(--panel-bg);
-            border-radius: var(--border-radius);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 2px solid transparent;
-            transition: border-color 0.5s, box-shadow 0.5s;
-            padding-bottom: 20px;
-        }
-
-        .result-container.success {
-            border-color: var(--primary);
-            box-shadow: 0 10px 30px var(--success-glow);
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         
-        .result-container.error {
-            border-color: #ff4444;
-            box-shadow: 0 10px 30px var(--error-glow);
-        }
-
-        #result-img {
-            max-width: 90%;
-            max-height: 75vh;
-            display: none;
-            object-fit: contain;
-            border-radius: calc(var(--border-radius) / 2);
-            margin: 20px 0;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        }
-
+        /* Loader */
         .loader {
-            display: none;
-            border: 4px solid #334155;
-            border-top: 4px solid var(--primary);
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #3b82f6;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
         }
-
-        .status-text {
-            display: none;
-            margin: 20px;
-            color: #94a3b8;
-            text-align: center;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 600px) {
-            h1 { font-size: 2rem; }
-            .container { padding: 15px; }
-            .result-container { min-height: 300px; }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col items-center p-4 md:p-8">
 
-    <header>
-        <h1>EKIN AI STUDIO</h1>
-        <p class="subtitle">Professional AI Image Generator</p>
+    <header class="w-full max-w-6xl mb-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-2">
+            EKIN AI STUDIO
+        </h1>
+        <p class="text-gray-400">Advanced Text-to-Image AI Generator</p>
     </header>
 
-    <div class="container">
+    <main class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
         
-        <div class="api-banner">
-            ⚠️ <strong>Info Penting:</strong> Sistem AI kini mewajibkan penggunaan API Key. Silakan dapatkan API Key Anda secara <strong>GRATIS</strong> dengan mendaftar di <a href="https://enter.pollinations.ai" target="_blank">enter.pollinations.ai</a>. Setelah login, salin kunci tersebut dan masukkan ke kolom di bawah ini.
-        </div>
-
-        <div class="input-group">
-            <label for="apikey">🔑 Pollinations API Key (Otomatis Tersimpan)</label>
-            <input type="password" id="apikey" placeholder="Masukkan API Key Anda di sini (contoh: pk_abc123...)" required>
-        </div>
-
-        <div class="input-group">
-            <label for="prompt">📝 Deskripsi Gambar (Prompt)</label>
-            <textarea id="prompt" rows="3" placeholder="Contoh: a cyberpunk city at night, neon lights, 8k resolution..."></textarea>
-        </div>
-
-        <div class="controls-row">
-            <div class="input-group">
-                <label for="model">🤖 Model AI</label>
-                <select id="model">
-                    <option value="flux">Flux (Cepat & Bagus)</option>
-                    <option value="flux-realism">Flux Realism (Fotorealistis)</option>
-                    <option value="flux-pro">Flux Pro (Detail Tinggi)</option>
-                    <option value="turbo">Turbo (Super Cepat)</option>
-                    <option value="any-dark">Any Dark (Sinematik/Gelap)</option>
-                </select>
+        <div class="lg:col-span-7 flex flex-col gap-6">
+            
+            <div class="glass-panel p-5 rounded-2xl">
+                <div class="bg-yellow-900/40 border border-yellow-600 text-yellow-200 text-sm p-4 rounded-lg mb-4 flex items-start gap-3">
+                    <i class="fas fa-exclamation-triangle mt-1"></i>
+                    <p>
+                        <strong>⚠️ Info Penting:</strong> Sistem AI kini mewajibkan penggunaan API Key. Silakan dapatkan API Key Anda secara GRATIS dengan mendaftar di <a href="https://enter.pollinations.ai" target="_blank" class="text-blue-400 underline font-bold">enter.pollinations.ai</a>. Setelah login, salin kunci tersebut dan masukkan ke kolom di bawah ini.
+                    </p>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-2">🔑 Pollinations API Key (Otomatis Tersimpan)</label>
+                    <input type="password" id="apiKey" placeholder="Masukkan API Key Anda di sini..." class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition">
+                </div>
             </div>
 
-            <div class="input-group">
-                <label for="style">🎨 Style Unik</label>
-                <select id="style">
-                    <option value="">Tidak ada (Sesuai Prompt)</option>
-                    <option value="Cinematic lighting, 8k resolution, highly detailed, professional photo style">Cinematic lighting, 8k</option>
-                    <option value="Quantum Fold Distortion, surreal collapsing realities, fractal patterns, intricate details">Quantum Fold</option>
-                    <option value="Lowbrow Pop Surrealism, absurd and humorous character design, highly detailed">Pop Surrealism</option>
-                    <option value="Tribal Explosion Graffiti, vibrant colors, kinetic energy, complex street art style">Tribal Graffiti</option>
-                    <option value="Ukiyo-e Japanese Woodblock Print, traditional ink style, flowing lines">Ukiyo-e Woodblock</option>
-                </select>
-            </div>
+            <div class="glass-panel p-5 rounded-2xl">
+                <label class="block text-sm font-semibold mb-2">💡 Prompt Gambar</label>
+                <textarea id="prompt" rows="4" placeholder="Deskripsikan gambar yang ingin Anda buat... (Contoh: Kucing terbang di luar angkasa)" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition mb-3"></textarea>
+                
+                <button onclick="enhancePrompt()" class="bg-slate-700 hover:bg-slate-600 text-sm py-2 px-4 rounded-lg transition border border-slate-500 mb-4 flex items-center gap-2">
+                    <i class="fas fa-magic"></i> Enhance Prompt
+                </button>
 
-            <div class="input-group">
-                <label for="ratio">📐 Aspek Rasio</label>
-                <select id="ratio">
-                    <option value="9:16">9:16 (Potret/Reels - 1080x1920)</option>
-                    <option value="1:1">1:1 (Kotak - 1024x1024)</option>
-                    <option value="16:9">16:9 (Lanskap - 1920x1080)</option>
-                    <option value="3:4">3:4 (Potret Klasik - 768x1024)</option>
-                    <option value="4:3">4:3 (Layar Standar - 1024x768)</option>
-                </select>
-            </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Model AI</label>
+                        <select id="model" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-2.5 text-white">
+                            <option value="flux">Flux (Terbaik/Realistis)</option>
+                            <option value="turbo">Turbo (Lebih Cepat)</option>
+                            <option value="flux-realism">Flux Realism</option>
+                            <option value="flux-anime">Flux Anime</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Style</label>
+                        <select id="style" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-2.5 text-white">
+                            <option value="default">Default</option>
+                            <option value="Psycadelic">Psychedelic</option>
+                            <option value="Macabre">Macabre</option>
+                            <option value="Surrealisme">Surrealisme</option>
+                            <option value="Chaotic">Chaotic</option>
+                            <option value="Anime">Anime</option>
+                            <option value="Chibi 3D Hyper Realistis">Chibi 3D Hyper Realistis</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Aspek Rasio (Resolusi)</label>
+                        <select id="aspectRatio" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-2.5 text-white">
+                            <option value="1024x1024">1:1 (Square HD - 1024x1024)</option>
+                            <option value="720x1280" selected>9:16 (Portrait HD - 720x1280)</option>
+                            <option value="1080x1920">9:16 (Portrait Full HD - 1080x1920)</option>
+                            <option value="1280x720">16:9 (Landscape HD - 1280x720)</option>
+                            <option value="1280x960">4:3 (Desktop HD - 1280x960)</option>
+                            <option value="960x1280">3:4 (Photo HD - 960x1280)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Seed Number (Opsional)</label>
+                        <input type="number" id="seed" placeholder="Kosong = Random" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
 
-            <div class="input-group">
-                <label for="seed">🎲 Seed (Opsional)</label>
-                <input type="number" id="seed" placeholder="Kosongkan untuk acak">
+                <div class="border border-slate-700 rounded-xl p-4 mb-6 bg-slate-800/50">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="font-semibold text-sm">©️ Aktifkan Watermark (Tampil di hasil Download)</label>
+                        <input type="checkbox" id="enableWatermark" class="w-5 h-5 accent-blue-500" checked>
+                    </div>
+                    <div id="watermarkSettings" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Teks Watermark</label>
+                            <input type="text" id="wmText" value="EKIN AI STUDIO" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Font</label>
+                            <select id="wmFont" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white">
+                                <option value="Arial">Arial</option>
+                                <option value="Impact">Impact</option>
+                                <option value="Courier New">Courier New</option>
+                                <option value="Georgia">Georgia</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="w-1/2">
+                                <label class="block text-xs text-gray-400 mb-1">Ukuran</label>
+                                <input type="number" id="wmSize" value="36" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white">
+                            </div>
+                            <div class="w-1/2">
+                                <label class="block text-xs text-gray-400 mb-1">Warna</label>
+                                <input type="color" id="wmColor" value="#ffffff" class="w-full h-[38px] bg-slate-800 border border-slate-600 rounded p-1 cursor-pointer">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Tata Letak (Posisi)</label>
+                            <select id="wmPosition" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white">
+                                <option value="bottom-left">Kiri Bawah</option>
+                                <option value="bottom-right">Kanan Bawah</option>
+                                <option value="top-right">Kanan Atas</option>
+                                <option value="top-left">Kiri Atas</option>
+                                <option value="center">Tengah</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="generateImage()" id="btnGenerate" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-4 px-6 rounded-xl transition shadow-lg transform active:scale-95 text-lg">
+                    <i class="fas fa-image mr-2"></i> Generate Gambar Sekarang
+                </button>
             </div>
         </div>
 
-        <button onclick="generateImage()">🔥 Generate Gambar</button>
-    </div>
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center min-h-[400px] relative">
+                <div id="loadingState" class="hidden flex-col items-center gap-4">
+                    <div class="loader"></div>
+                    <p class="text-blue-300 animate-pulse" id="loadingText">AI Sedang Merender Gambar HD...</p>
+                </div>
+                
+                <div id="resultState" class="w-full hidden flex-col items-center">
+                    <img id="generatedImage" src="" alt="Hasil Generate AI" class="w-full rounded-xl shadow-2xl mb-4 border border-slate-600 object-contain max-h-[450px]">
+                    <button id="btnDownload" onclick="downloadImage()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg flex justify-center items-center gap-2">
+                        <i class="fas fa-download"></i> Download Kualitas Terbaik (PNG)
+                    </button>
+                </div>
 
-    <div class="result-container" id="result-container">
-        <div class="loader" id="loader"></div>
-        <img id="result-img" alt="Hasil EKIN AI STUDIO" crossorigin="anonymous">
-        <p class="status-text" id="status-text"></p>
-        
-        <button id="btn-download" class="btn-download" onclick="downloadImage()">💾 Download Resolusi Tinggi (PNG)</button>
-    </div>
+                <div id="emptyState" class="text-gray-500 text-center">
+                    <i class="fas fa-image text-5xl mb-3 opacity-50"></i>
+                    <p>Hasil gambar akan muncul di sini</p>
+                </div>
+            </div>
+
+            <div class="glass-panel p-5 rounded-2xl flex-grow flex flex-col max-h-[350px]">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg"><i class="fas fa-history mr-2"></i> Riwayat Prompt</h3>
+                    <button onclick="clearHistory()" class="text-xs bg-red-900/50 hover:bg-red-800 text-red-200 py-1 px-3 rounded-md transition">Clear</button>
+                </div>
+                <div id="historyList" class="flex-grow overflow-y-auto space-y-2 pr-2">
+                    </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="w-full max-w-6xl mt-12 mb-4 text-center text-sm text-gray-500 border-t border-slate-700 pt-6">
+        <p>Copyright @2026 EKIN AI STUDIO</p>
+        <p>Powered by. Pollinations API</p>
+        <p class="mt-1">Developed by. Ekin Liu | Thanks to Github & Vercel & Gemini AI</p>
+    </footer>
 
     <script>
-        let currentObjectURL = null;
+        const BASE_API_URL = "https://gen.pollinations.ai/image/"; 
+        let currentBlobUrl = null;
 
-        // FITUR AUTO-SAVE: Memuat API Key yang tersimpan saat web dibuka
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedKey = localStorage.getItem('ekin_api_key');
-            if (savedKey) {
-                document.getElementById('apikey').value = savedKey;
-            }
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedKey = localStorage.getItem("ekin_api_key");
+            if (savedKey) document.getElementById("apiKey").value = savedKey;
+
+            document.getElementById("apiKey").addEventListener("input", (e) => {
+                localStorage.setItem("ekin_api_key", e.target.value);
+            });
+
+            document.getElementById("enableWatermark").addEventListener("change", (e) => {
+                document.getElementById("watermarkSettings").style.opacity = e.target.checked ? "1" : "0.4";
+                document.getElementById("watermarkSettings").style.pointerEvents = e.target.checked ? "auto" : "none";
+            });
+
+            loadHistory();
         });
 
+        // PERBAIKAN: Enhance Prompt sekarang menambahkan instruksi ketajaman tinggi (sharp focus, crisp)
+        function enhancePrompt() {
+            const promptInput = document.getElementById("prompt");
+            if (!promptInput.value.trim()) {
+                alert("Masukkan prompt dasar terlebih dahulu!");
+                return;
+            }
+            const enhancements = ", masterpiece, 8k resolution, highly detailed, sharp focus, crisp, intricate details, stunning visuals, cinematic lighting, ultra-realistic, octane render, best quality";
+            if (!promptInput.value.includes("masterpiece")) {
+                promptInput.value += enhancements;
+            }
+        }
+
+        function getStyleModifier(style) {
+            const modifiers = {
+                "default": "",
+                "Psycadelic": ", vibrant colors, trippy, hallucination, fractal patterns, highly detailed psychedelic art, neon glow",
+                "Macabre": ", dark, gothic, eerie, horror, macabre, highly detailed, creepy atmosphere, shadows",
+                "Surrealisme": ", dreamlike, Salvador Dali style, surrealism, bizarre, mind-bending, imaginative",
+                "Chaotic": ", chaotic, messy, explosive, abstract, high energy, disorganized but beautiful, splatters",
+                "Anime": ", masterpiece anime style, studio ghibli, makoto shinkai, highly detailed, beautiful lighting, cel shading",
+                "Chibi 3D Hyper Realistis": ", chibi style, 3D render, Unreal Engine 5, hyper realistic, cute, ultra detailed, ray tracing, volumetric lighting"
+            };
+            return modifiers[style] || "";
+        }
+
         async function generateImage() {
-            const apiKey = document.getElementById('apikey').value.trim();
-            const promptInput = document.getElementById('prompt').value.trim();
+            const apiKey = document.getElementById("apiKey").value.trim();
+            const rawPrompt = document.getElementById("prompt").value.trim();
+            const model = document.getElementById("model").value;
+            const style = document.getElementById("style").value;
+            const aspect = document.getElementById("aspectRatio").value.split("x");
+            let seed = document.getElementById("seed").value;
             
-            if (!apiKey) {
-                alert('Tolong masukkan API Key Anda! Jika belum punya, dapatkan di enter.pollinations.ai');
+            if (!rawPrompt) {
+                alert("Mohon masukkan prompt gambar!");
                 return;
             }
-
-            if (!promptInput) {
-                alert('Silakan masukkan deskripsi gambar (prompt)!');
-                return;
-            }
-
-            // FITUR AUTO-SAVE: Menyimpan API Key ke browser
-            localStorage.setItem('ekin_api_key', apiKey);
-
-            const model = document.getElementById('model').value;
-            const style = document.getElementById('style').value;
-            const ratio = document.getElementById('ratio').value;
-            let seed = document.getElementById('seed').value;
 
             if (!seed) {
                 seed = Math.floor(Math.random() * 999999999);
+                document.getElementById("seed").value = seed;
             }
 
-            let width = 1024, height = 1024;
-            if (ratio === '16:9') { width = 1920; height = 1080; }
-            else if (ratio === '9:16') { width = 1080; height = 1920; }
-            else if (ratio === '3:4') { width = 768; height = 1024; }
-            else if (ratio === '4:3') { width = 1024; height = 768; }
-
-            const finalPrompt = style ? `${promptInput}, ${style}` : promptInput;
+            const finalPrompt = rawPrompt + getStyleModifier(style);
             const encodedPrompt = encodeURIComponent(finalPrompt);
-
-            const url = `https://gen.pollinations.ai/image/${encodedPrompt}?model=${model}&width=${width}&height=${height}&seed=${seed}&nologo=true&key=${apiKey}`;
-
-            const containerEl = document.getElementById('result-container');
-            const imgEl = document.getElementById('result-img');
-            const loader = document.getElementById('loader');
-            const statusText = document.getElementById('status-text');
-            const btnDownload = document.getElementById('btn-download');
-
-            // Reset UI
-            imgEl.style.display = 'none';
-            btnDownload.style.display = 'none'; // Sembunyikan tombol download
-            containerEl.classList.remove('success', 'error');
-            loader.style.display = 'block';
-            statusText.innerText = "Memproses request ke server AI... Mohon tunggu.";
-            statusText.style.color = "#94a3b8";
-            statusText.style.display = 'block';
-
-            if (currentObjectURL) {
-                URL.revokeObjectURL(currentObjectURL);
-                currentObjectURL = null;
+            const width = aspect[0];
+            const height = aspect[1];
+            
+            let url = `${BASE_API_URL}${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&model=${model}&nologo=true`;
+            if (apiKey) {
+                url += `&key=${apiKey}`;
             }
+
+            document.getElementById("emptyState").classList.add("hidden");
+            document.getElementById("resultState").classList.add("hidden");
+            document.getElementById("loadingState").classList.remove("hidden");
+            
+            // Ubah teks loading berdasarkan ukuran yang dirender
+            document.getElementById("loadingText").innerText = width >= 1080 || height >= 1080 ? "AI Sedang Merender Gambar FULL HD..." : "AI Sedang Merender Gambar HD...";
+
+            document.getElementById("btnGenerate").disabled = true;
+            document.getElementById("btnGenerate").innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
 
             try {
                 const response = await fetch(url);
-                
-                if (response.status === 401 || response.status === 403) {
-                    throw new Error("Akses Ditolak (401/403). API Key Anda salah atau kuota model ini habis.");
-                }
 
                 if (!response.ok) {
-                    throw new Error(`Kesalahan API: ${response.status} ${response.statusText}`);
+                    throw new Error(`HTTP Error! Status: ${response.status}`);
                 }
 
-                const imageBlob = await response.blob();
+                const blob = await response.blob();
                 
-                if (imageBlob.type.includes('application/json') || imageBlob.type.includes('text/html')) {
-                    throw new Error("Server tidak mengembalikan file gambar. Kemungkinan API Key salah.");
-                }
-
-                currentObjectURL = URL.createObjectURL(imageBlob);
-
-                imgEl.onload = () => {
-                    loader.style.display = 'none';
-                    statusText.style.display = 'none';
-                    imgEl.style.display = 'block';
-                    btnDownload.style.display = 'flex'; // Munculkan tombol download
-                    containerEl.classList.add('success');
-                };
+                if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
                 
-                imgEl.onerror = () => {
-                     throw new Error("Gagal merender gambar ke layar.");
-                };
+                currentBlobUrl = URL.createObjectURL(blob);
+                document.getElementById("generatedImage").src = currentBlobUrl;
 
-                imgEl.src = currentObjectURL;
+                saveToHistory(rawPrompt);
+
+                document.getElementById("loadingState").classList.add("hidden");
+                document.getElementById("resultState").classList.remove("hidden");
 
             } catch (error) {
-                loader.style.display = 'none';
-                containerEl.classList.add('error');
-                statusText.innerText = `Gagal: ${error.message}`;
-                statusText.style.color = "#ff4444";
-                console.error("Image generation error:", error);
+                console.error("Error Detail:", error);
+                alert("Gagal generate gambar. Periksa koneksi internet atau API Key Anda.");
+                document.getElementById("emptyState").classList.remove("hidden");
+                document.getElementById("loadingState").classList.add("hidden");
+            } finally {
+                document.getElementById("btnGenerate").disabled = false;
+                document.getElementById("btnGenerate").innerHTML = '<i class="fas fa-image mr-2"></i> Generate Gambar Sekarang';
             }
         }
 
-        // FUNGSI BARU: Konversi ke PNG dan Download
-        function downloadImage() {
-            const imgEl = document.getElementById('result-img');
+        async function downloadImage() {
+            const img = document.getElementById("generatedImage");
+            const btnDownload = document.getElementById("btnDownload");
+            const originalBtnHtml = btnDownload.innerHTML;
             
-            // Membuat elemen canvas transparan untuk merender ulang gambar sebagai murni PNG
-            const canvas = document.createElement('canvas');
-            canvas.width = imgEl.naturalWidth;
-            canvas.height = imgEl.naturalHeight;
-            const ctx = canvas.getContext('2d');
+            if (!img.src) return;
+
+            if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                alert("Harap tunggu gambar termuat sepenuhnya.");
+                return;
+            }
+
+            btnDownload.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengekspor PNG Kualitas Tinggi...';
+            btnDownload.disabled = true;
+            btnDownload.classList.add("opacity-75", "cursor-not-allowed");
+
+            try {
+                const enableWM = document.getElementById("enableWatermark").checked;
+
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = "high";
+                
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                if (enableWM) {
+                    const text = document.getElementById("wmText").value || "EKIN AI STUDIO";
+                    const font = document.getElementById("wmFont").value;
+                    const size = parseInt(document.getElementById("wmSize").value);
+                    const color = document.getElementById("wmColor").value;
+                    const position = document.getElementById("wmPosition").value;
+
+                    ctx.font = `bold ${size}px ${font}`;
+                    ctx.fillStyle = color;
+                    
+                    ctx.shadowColor = "rgba(0,0,0,0.8)";
+                    ctx.shadowOffsetX = 3;
+                    ctx.shadowOffsetY = 3;
+                    ctx.shadowBlur = 5;
+
+                    const padding = 35;
+                    let x = padding;
+                    let y = padding;
+                    const textWidth = ctx.measureText(text).width;
+
+                    switch(position) {
+                        case "top-left": x = padding; y = size + padding; break;
+                        case "top-right": x = canvas.width - textWidth - padding; y = size + padding; break;
+                        case "bottom-left": x = padding; y = canvas.height - padding; break;
+                        case "bottom-right": x = canvas.width - textWidth - padding; y = canvas.height - padding; break;
+                        case "center": x = (canvas.width - textWidth) / 2; y = canvas.height / 2; break;
+                    }
+
+                    ctx.fillText(text, x, y);
+                }
+
+                const fileName = enableWM ? `EKIN-AI-WM-${Date.now()}.png` : `EKIN-AI-HQ-${Date.now()}.png`;
+
+                await new Promise((resolve, reject) => {
+                    canvas.toBlob(function(blob) {
+                        if (!blob) {
+                            reject("Gagal memproses gambar.");
+                            return;
+                        }
+                        const blobUrl = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.style.display = "none";
+                        a.href = blobUrl;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(blobUrl);
+                            resolve();
+                        }, 1000);
+                    }, "image/png", 1.0); 
+                });
+
+                setTimeout(() => {
+                    alert(`✅ Gambar Resolusi Tinggi (${canvas.width}x${canvas.height}) berhasil disimpan ke galeri!`);
+                }, 500);
+
+            } catch (err) {
+                console.error("Download Error:", err);
+                alert("❌ Terjadi kesalahan saat mengunduh gambar.");
+            } finally {
+                btnDownload.innerHTML = originalBtnHtml;
+                btnDownload.disabled = false;
+                btnDownload.classList.remove("opacity-75", "cursor-not-allowed");
+            }
+        }
+
+        function saveToHistory(promptText) {
+            let history = JSON.parse(localStorage.getItem("ekin_history") || "[]");
+            if (history.length > 0 && history[0] === promptText) return;
             
-            // Gambar img ke dalam canvas
-            ctx.drawImage(imgEl, 0, 0);
+            history.unshift(promptText); 
+            if (history.length > 20) history.pop(); 
             
-            // Ekstrak data dari canvas secara spesifik sebagai image/png
-            const dataURL = canvas.toDataURL('image/png');
-            
-            // Buat link download otomatis
-            const a = document.createElement('a');
-            a.href = dataURL;
-            a.download = `EKIN-AI-${Date.now()}.png`; // Nama file unik
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            localStorage.setItem("ekin_history", JSON.stringify(history));
+            loadHistory();
+        }
+
+        function loadHistory() {
+            const historyList = document.getElementById("historyList");
+            historyList.innerHTML = "";
+            let history = JSON.parse(localStorage.getItem("ekin_history") || "[]");
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<p class="text-xs text-gray-500 italic">Belum ada riwayat prompt.</p>';
+                return;
+            }
+
+            history.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "bg-slate-700/50 hover:bg-slate-600 p-3 rounded-lg cursor-pointer transition text-sm text-gray-300 border border-slate-600/50 flex gap-2";
+                div.onclick = () => { document.getElementById("prompt").value = item; };
+                div.innerHTML = `<i class="fas fa-quote-left text-blue-400 mt-1 opacity-50"></i> <span class="line-clamp-2">${item}</span>`;
+                historyList.appendChild(div);
+            });
+        }
+
+        function clearHistory() {
+            if(confirm("Apakah Anda yakin ingin menghapus semua riwayat?")) {
+                localStorage.removeItem("ekin_history");
+                loadHistory();
+            }
         }
     </script>
 </body>
