@@ -34,7 +34,7 @@ export default function Home() {
     const savedHistory = JSON.parse(localStorage.getItem("ekin_history") || "[]");
     setHistory(savedHistory);
 
-    fetch("https://gen.pollinations.ai/models")
+    fetch("https://image.pollinations.ai/models")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
