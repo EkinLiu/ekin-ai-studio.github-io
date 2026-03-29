@@ -13,6 +13,7 @@ export default function Home() {
   const [aspectRatio, setAspectRatio] = useState("720x1280");
   const [seed, setSeed] = useState("");
   const [enableWatermark, setEnableWatermark] = useState(true);
+  const [availableModels, setAvailableModels] = useState<{name: string, description: string}[]>([]);
   
   const [wmText, setWmText] = useState("EKIN AI STUDIO");
   const [wmFont, setWmFont] = useState("Arial");
@@ -32,6 +33,15 @@ export default function Home() {
   useEffect(() => {
     const savedHistory = JSON.parse(localStorage.getItem("ekin_history") || "[]");
     setHistory(savedHistory);
+
+    fetch("https://gen.pollinations.ai/models")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setAvailableModels(data);
+        }
+      })
+      .catch((err) => console.error("Gagal memuat daftar model:", err));
   }, []);
 
   const enhancePrompt = () => {
@@ -255,10 +265,20 @@ export default function Home() {
               <div>
                 <label className="block text-xs text-gray-400 mb-1">Model AI</label>
                 <select value={model} onChange={(e) => setModel(e.target.value)} className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2.5 text-white">
-                  <option value="flux">Flux (Terbaik/Realistis)</option>
-                  <option value="turbo">Turbo (Lebih Cepat)</option>
-                  <option value="flux-realism">Flux Realism</option>
-                  <option value="flux-anime">Flux Anime</option>
+                  {availableModels.length > 0 ? (
+                    availableModels.map((m) => (
+                      <option key={m.name} value={m.name} className="truncate">
+                        {m.description || m.name}
+                      </option>
+                    ))
+                  ) : (
+                    <>
+                      <option value="flux">Flux (Terbaik/Realistis)</option>
+                      <option value="turbo">Turbo (Lebih Cepat)</option>
+                      <option value="flux-realism">Flux Realism</option>
+                      <option value="flux-anime">Flux Anime</option>
+                    </>
+                  )}
                 </select>
               </div>
               <div>
