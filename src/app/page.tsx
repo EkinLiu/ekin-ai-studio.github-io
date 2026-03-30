@@ -34,7 +34,36 @@ export default function Home() {
     const savedHistory = JSON.parse(localStorage.getItem("ekin_history") || "[]");
     setHistory(savedHistory);
 
+    // Mengembalikan fitur fetch model dinamis sesuai instruksi
+    fetch("https://image.pollinations.ai/models")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const formattedModels = data.map((item: any) => {
+            if (typeof item === 'string') return { name: item, description: item };
+            return {
+              name: item.name || item.id,
+              description: item.description || item.name || item.id,
+              type: item.type,
+              output_modalities: item.output_modalities
+            };
+          });
 
+          const imageModels = formattedModels.filter((m: any) => {
+            if (m.type === 'text' || m.type === 'chat' || m.type === 'llm') return false;
+            if (m.output_modalities && Array.isArray(m.output_modalities) && !m.output_modalities.includes('image')) return false;
+            return true;
+          });
+
+          if (imageModels.length > 0) {
+            setAvailableModels(imageModels);
+          }
+        }
+      })
+      .catch((err) => console.error("Gagal memuat daftar model API, menggunakan fallback model:", err));
   }, []);
 
   const enhancePrompt = () => {
