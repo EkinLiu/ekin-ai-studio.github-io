@@ -138,7 +138,7 @@ export default function Home() {
       } else if (error.message === "500_SERVER_ERROR") {
         alert("⚠️ Server Error: Server AI sedang penuh atau mengalami gangguan. Coba lagi nanti.");
       } else {
-        alert("❌ Gagal generate gambar. Periksa koneksi internet Anda atau coba ganti Model AI lain.");
+        alert(`❌ Gagal generate gambar (Error: ${error.message}).\n\n📌 Kemungkinan penyebab:\n1. Model AI yang dipilih sedang offline/maintenance dari peladen Pollinations.\n2. Koneksi internet kurang stabil.\n\n💡 SOLUSI: Silakan ganti ke Model AI lain (seperti FLUX atau SANA) dan coba lagi.`);
       }
     } finally {
       setLoading(false);
@@ -287,10 +287,14 @@ export default function Home() {
                     ))
                   ) : (
                     <>
-                      <option value="flux">Flux (Terbaik/Realistis)</option>
-                      <option value="turbo">Turbo (Lebih Cepat)</option>
-                      <option value="flux-realism">Flux Realism</option>
-                      <option value="flux-anime">Flux Anime</option>
+                      <option value="flux">Flux (Default/Realistis)</option>
+                      <option value="sana">Sana (Sangat Cepat)</option>
+                      <option value="turbo">Z-Image Turbo (Cepat)</option>
+                      <option value="flux-pro">Flux Pro (Kualitas Tinggi)</option>
+                      <option value="any-dark">Any Dark (Tema Gelap)</option>
+                      <option value="dall-e-3">DALL-E 3 Style (Terbaik)</option>
+                      <option value="flux-anime">Flux Anime (Kartun/Animasi)</option>
+                      <option value="flux-realism">Flux Realism (Fotografi)</option>
                     </>
                   )}
                 </select>
