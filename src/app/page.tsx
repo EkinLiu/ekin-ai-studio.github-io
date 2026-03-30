@@ -34,14 +34,38 @@ export default function Home() {
     const savedHistory = JSON.parse(localStorage.getItem("ekin_history") || "[]");
     setHistory(savedHistory);
 
+    // Mengambil daftar model dan memfilternya agar hanya model gambar yang tampil
     fetch("https://image.pollinations.ai/models")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
         if (Array.isArray(data)) {
-          setAvailableModels(data);
+          // Normalisasi format (bisa string atau object)
+          const formattedModels = data.map((item: any) => {
+            if (typeof item === 'string') return { name: item, description: item };
+            return {
+              name: item.name || item.id,
+              description: item.description || item.name || item.id,
+              type: item.type,
+              output_modalities: item.output_modalities
+            };
+          });
+
+          // Filter khusus untuk model yang memproduksi gambar (buang yang khusus teks/chat)
+          const imageModels = formattedModels.filter((m: any) => {
+            if (m.type === 'text' || m.type === 'chat' || m.type === 'llm') return false;
+            if (m.output_modalities && Array.isArray(m.output_modalities) && !m.output_modalities.includes('image')) return false;
+            return true;
+          });
+
+          if (imageModels.length > 0) {
+            setAvailableModels(imageModels);
+          }
         }
       })
-      .catch((err) => console.error("Gagal memuat daftar model:", err));
+      .catch((err) => console.error("Gagal memuat daftar model API, menggunakan fallback model:", err));
   }, []);
 
   const enhancePrompt = () => {
@@ -97,7 +121,7 @@ export default function Home() {
     const encodedPrompt = encodeURIComponent(finalPrompt);
     const [width, height] = aspectRatio.split("x");
 
-    let url = `${BASE_API_URL}${encodedPrompt}?width=${width}&height=${height}&seed=${currentSeed}&model=${model}&nologo=true`;
+    let url = `${BASE_API_URL}${encodedPrompt}?width=${width}&height=${height}&seed=${currentSeed}&model=${model}`;
     if (apiKey) {
       url += `&key=${apiKey}`;
     }
@@ -111,9 +135,18 @@ export default function Home() {
       setLoadingText("AI Sedang Merender Gambar HD...");
     }
 
+    // Menambahkan AbortController untuk timeout fetch
+    const abortController = new AbortController();
+    const timeoutId = setTimeout(() => abortController.abort(), 60000); // 60 detik timeout
+    
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, { signal: abortController.signal });
+      clearTimeout(timeoutId); // Hapus timeout jika berhasil sebelum 60s
+
       if (!response.ok) {
+        if (response.status === 402) throw new Error("402_QUOTA_EXCEEDED");
+        if (response.status === 429) throw new Error("429_TOO_MANY_REQUESTS");
+        if (response.status >= 500) throw new Error("500_SERVER_ERROR");
         throw new Error(`HTTP Error! Status: ${response.status}`);
       }
 
@@ -123,9 +156,21 @@ export default function Home() {
       setResultImg(currentBlobUrl.current);
 
       saveToHistory(rawPrompt);
-    } catch (error) {
+    } catch (error: any) {
+      clearTimeout(timeoutId); // Pastikan timeout dihapus jika error
       console.error("Error Detail:", error);
-      alert("Gagal generate gambar. Periksa koneksi internet atau API Key Anda.");
+      
+      if (error.name === "AbortError") {
+        alert("⏱️ Request Timeout: Server AI terlalu lama merespons. Silakan coba lagi.");
+      } else if (error.message === "402_QUOTA_EXCEEDED") {
+        alert("❌ Akses Ditolak: API Key Pollinations Anda telah melampaui limit gratis atau memerlukan paket berbayar.");
+      } else if (error.message === "429_TOO_MANY_REQUESTS") {
+        alert("⚠️ Terlalu Banyak Request: Harap tunggu beberapa saat sebelum mencoba lagi.");
+      } else if (error.message === "500_SERVER_ERROR") {
+        alert("⚠️ Server Error: Server AI sedang penuh atau mengalami gangguan. Coba lagi nanti.");
+      } else {
+        alert("❌ Gagal generate gambar. Periksa koneksi internet Anda atau coba ganti Model AI lain.");
+      }
     } finally {
       setLoading(false);
     }
