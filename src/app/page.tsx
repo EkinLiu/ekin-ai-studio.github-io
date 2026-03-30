@@ -287,14 +287,8 @@ export default function Home() {
                     ))
                   ) : (
                     <>
-                      <option value="flux">Flux (Default/Realistis)</option>
+                      <option value="flux">Flux (Utama/Terbaik)</option>
                       <option value="sana">Sana (Sangat Cepat)</option>
-                      <option value="turbo">Z-Image Turbo (Cepat)</option>
-                      <option value="flux-pro">Flux Pro (Kualitas Tinggi)</option>
-                      <option value="any-dark">Any Dark (Tema Gelap)</option>
-                      <option value="dall-e-3">DALL-E 3 Style (Terbaik)</option>
-                      <option value="flux-anime">Flux Anime (Kartun/Animasi)</option>
-                      <option value="flux-realism">Flux Realism (Fotografi)</option>
                     </>
                   )}
                 </select>
